@@ -211,7 +211,9 @@ s4_stamp:
 	move.w	d0,BLTBMOD(a6)
 	move.w	#40-BOB_BPR,BLTCMOD(a6)
 	move.w	#40-BOB_BPR,BLTDMOD(a6)
-	move.w	#320<<6|BOB_BPR/2,BLTSIZE(a6)	; 64 rows x 5 planes
+	move.w	#(320<<6)!(BOB_BPR/2),BLTSIZE(a6) ; 64 rows x 5 planes
+	; NB vasm mot syntax has NO C precedence: a<<b|c/d evaluates
+	; left-to-right — the unparenthesized form halved the height
 	rts
 
 ;---------------------------------------------------------------------
@@ -229,7 +231,7 @@ s4_restore:
 	move.l	a0,BLTDPTH(a6)
 	move.w	#40-BOB_BPR,BLTAMOD(a6)
 	move.w	#40-BOB_BPR,BLTDMOD(a6)
-	move.w	#320<<6|BOB_BPR/2,BLTSIZE(a6)
+	move.w	#(320<<6)!(BOB_BPR/2),BLTSIZE(a6)
 	rts
 
 ; 8 stamp positions, word-aligned, as byte offsets into the interleaved

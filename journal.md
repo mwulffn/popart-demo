@@ -283,3 +283,18 @@ Modes: fullscreen art, logos (blitter objects), fonts/sprite sheets.
   plasma -> comic stamps (BANG!, slam frame caught) -> conveyor ->
   cards 1/2/3 -> song end -> magenta print-out freeze. Audio DMA $f
   throughout; scene cuts land on song positions.
+
+## 2026-07-04 — Bugfix: scene 4 bobs clipped to half height
+
+User-reported: burst bobs showed only top ~50%. Cause found by grepping
+the built binary for the BLTSIZE immediate: `3d7c 2806` — height 160,
+not 320. **vasm mot syntax has NO C-style operator precedence**:
+`320<<6|BOB_BPR/2` evaluates strictly left-to-right as
+`((320<<6)|12)/2 = $2806`, halving the blit height. Fix: parenthesize —
+`(320<<6)!(BOB_BPR/2)` — in both s4_stamp and s4_restore. All other
+BLTSIZE expressions audited: none mix division, all correct.
+Verified: BLTSIZE opcode now $5006; halt-and-screenshot in emulator
+shows full 89x60 px ZAP! stamp (was 89x30). Lesson: never write an
+unparenthesized multi-operator constant expression in vasm; the binary
+grep (`xxd | grep 3d7c`) is the fastest way to check what an immediate
+actually assembled to.
