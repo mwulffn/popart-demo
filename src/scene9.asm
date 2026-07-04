@@ -3,9 +3,7 @@
 ;
 ; The gallery piece: one full-screen 256-color print (320x256x8,
 ; contiguous planes, AGA 64-bit fetch). No motion — after five scenes
-; of process the demo hangs the finished work and lets it sit. The
-; only event: a 2-frame paper flash when the B-reprise lands (pos 26)
-; — one last squeegee pass over the masterpiece.
+; of process the demo hangs the finished work and lets it sit.
 ;
 ; AGA notes: FMODE=3 (8 planes lowres won't fit the DMA slots at
 ; 16-bit fetch), so DDFSTOP moves to $b8 (5 fetches x 32 cc) and the
@@ -18,9 +16,6 @@
 
 	xdef	sc9_init
 	xdef	sc9_update
-
-	xref	songpos
-	xref	songrow
 
 PLSIZE	equ	40*256			; one contiguous bitplane
 
@@ -97,7 +92,7 @@ sc9_init:
 	and.w	#$00f0,d0
 	lsl.w	#4,d0
 	or.w	d0,d4
-	move.w	d4,s9_col0
+	move.w	d4,cop9_col0+2
 
 	; --- bitplane pointers: 8 contiguous planes ---
 	lea	cop9_bpl+2,a1
@@ -111,33 +106,13 @@ sc9_init:
 	addq.w	#8,a1
 	dbf	d1,.bpl
 
-	clr.w	s9_slam
-	clr.w	s9_seen
-
 	lea	cop_scene9,a0
 	move.l	a0,COP1LC(a6)
 	rts
 
 ;---------------------------------------------------------------------
 sc9_update:
-	; one 2-frame paper flash when the B-reprise hits (pos 26)
-	cmp.w	#26,songpos
-	bne.s	.armed
-	tst.w	s9_seen
-	bne.s	.armed
-	st	s9_seen
-	move.w	#2,s9_slam
-.armed:
-	move.w	#$0210,d0		; 8 planes on
-	move.w	s9_col0,d1
-	tst.w	s9_slam
-	beq.s	.set
-	subq.w	#1,s9_slam
-	move.w	#$0200,d0		; planes off -> COLOR00 slab
-	move.w	#$0fff,d1
-.set:	move.w	d0,cop9_con0+2
-	move.w	d1,cop9_col0+2
-	rts
+	rts				; static scene, nothing to do per frame
 
 	include	"build/art/canvas.i"
 
@@ -178,6 +153,3 @@ cop9_con0:
 	section	s9vars,bss
 ;---------------------------------------------------------------------
 s9_lobuf:	ds.w	32
-s9_col0:	ds.w	1
-s9_slam:	ds.w	1
-s9_seen:	ds.w	1

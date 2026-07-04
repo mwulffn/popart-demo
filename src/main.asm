@@ -25,6 +25,8 @@
 _LVOForbid	equ	-132
 _LVOSuperState	equ	-150
 
+CIAAPRA		equ	$bfe001		; bit6 = left mouse button, active low
+
 	xref	_mt_install
 	xref	_mt_init
 	xref	_mt_end
@@ -93,6 +95,21 @@ start:
 	move.w	#$0038,DDFSTRT(a6)
 	move.w	#$00d0,DDFSTOP(a6)
 
+	; --- display on: blank copper list until scene 1 installs its own
+	lea	cop_blank,a0
+	move.l	a0,COP1LC(a6)
+	move.w	d0,COPJMP1(a6)
+	move.w	#$87c0,DMACON(a6)	; master+bitplane+copper+blitter+blithog
+
+	; --- hold on black until left mouse button click — OBS-recording
+	; aid only (gives time to arm capture before anything starts);
+	; disabled for normal builds, uncomment for a recording session ---
+	if 0
+.waitclick:
+	btst.b	#6,CIAAPRA
+	bne.s	.waitclick		; bit6=1 -> button up, keep waiting
+	endc
+
 	; --- music: ptplayer CIA interrupt + module start ---
 	move.l	vbrbase,a0
 	moveq	#1,d0			; PAL
@@ -105,12 +122,6 @@ INITPOS	equ	0
 	moveq	#INITPOS,d0		; song start (build with
 	jsr	_mt_init		; INITPOS=n to jump to a scene)
 	st	_mt_Enable
-
-	; --- display on: blank copper list until scene 1 installs its own
-	lea	cop_blank,a0
-	move.l	a0,COP1LC(a6)
-	move.w	d0,COPJMP1(a6)
-	move.w	#$87c0,DMACON(a6)	; master+bitplane+copper+blitter+blithog
 
 	move.w	#-1,curscene		; force scene 0 init on first frame
 
