@@ -19,11 +19,15 @@ $(BUILD)/demo-release.adf: $(BUILD)/demo.shr src/startup-sequence
 	    + write $(BUILD)/demo.shr demo
 	@echo "--- $@:" && $(XDFTOOL) $@ list
 
-$(BUILD)/main.o: src/main.asm | $(BUILD)
+OBJS := $(BUILD)/main.o $(BUILD)/ptplayer.o $(BUILD)/music.o
+
+$(BUILD)/%.o: src/%.asm | $(BUILD)
 	$(VASM) -m68020 -Fhunk -quiet -o $@ $<
 
-$(BUILD)/demo: $(BUILD)/main.o
-	$(VLINK) -bamigahunk -s -o $@ $<
+$(BUILD)/music.o: music/kc-dancinonamiga.mod
+
+$(BUILD)/demo: $(OBJS)
+	$(VLINK) -bamigahunk -s -M$(BUILD)/demo.map -o $@ $(OBJS)
 
 $(BUILD)/demo.adf: $(BUILD)/demo src/startup-sequence
 	rm -f $@

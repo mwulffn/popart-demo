@@ -96,8 +96,8 @@ CUT: squeegee at end of pos 15.
 
 VISUAL: The comic panel. Background: Flux-generated comic-book explosion
 panel (Lichtenstein pastiche: starburst, thick outlines, halftone
-shading), 320×256, 32 colors, static. On EVERY snare hit (rows 8, 24,
-40, 56 — read from row counter): a comic burst bob (starburst with
+shading), 320×256, 32 colors, static. On EVERY snare hit (row mod 8 == 4
+— read from row counter): a comic burst bob (starburst with
 word) blitter-stamped at one of 8 pre-set panel positions, cycling
 words **POP! / BANG! / ZAP! / WHAAM!** (4 bobs, 96×64, cookie-cut).
 Each stamp lives 12 frames then is restored (double-buffered background
@@ -170,7 +170,8 @@ FIN.
   `pos < 4 → scene1, < 10 → scene2, < 16 → scene3, < 22 → scene4,
   < 28 → scene5, else scene6`. Squeegee starts 12 frames before the
   boundary (position + row lookahead: row ≥ 58 of last position).
-- Beat = row mod 16 == 0 (4 beats/bar at speed 6). Snare = row mod 16
-  == 8. Both from ptplayer row counter, exported.
+- Groove is swing (F05/F03 alternating, tempo 115): kick = row mod 8
+  == 0 (downbeat), snare = row mod 8 == 4, bar = 16 rows, position =
+  4 bars. All from ptplayer row counter (PatternPos/16), exported.
 - Every effect double-buffers or is copper-only; target steady 50 fps
   except scene 3 (25 fps acceptable — dots may render every 2nd frame).
