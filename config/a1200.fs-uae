@@ -1,0 +1,15 @@
+[config]
+amiga_model = A1200
+kickstart_file = ../kickstart/Kickstart v3.1 rev 40.68 (1993)(Commodore)(A1200).rom
+# 4 MB trapdoor fast RAM — common real-world A1200 config, our target machine
+fast_memory = 4096
+# turbo floppy for dev iteration
+floppy_drive_speed = 0
+screenshots_output_dir = ../screenshots
+window_width = 720
+window_height = 568
+
+# GDB remote debugger (patched fs-uae only, tools/fs-uae-gdb/)
+# remote_debugger value = seconds emulator waits for GDB connection at startup
+remote_debugger = 200
+remote_debugger_port = 2345

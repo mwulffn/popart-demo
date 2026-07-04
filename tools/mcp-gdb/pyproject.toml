@@ -1,0 +1,15 @@
+[project]
+name = "mcp-gdb-demo-fable"
+version = "0.1.0"
+description = "GDB MCP server for Amiga demo debugging with FS-UAE"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]>=1.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["server"]
