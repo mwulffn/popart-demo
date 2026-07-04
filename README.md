@@ -58,8 +58,9 @@ Not included, not covered by that license, and not redistributable:
   restricts redistributing modified builds).
 
 Bundled under their own terms:
-- `music/kc-dancinonamiga.mod` — "DancinOnAmiga" by Katie Cadet, Public
-  Domain (`music/LICENSE.md`).
+- `music/kc-dancinonamiga.mod` — "DancinOnAmiga" by
+  [Katie Cadet](https://modarchive.org/index.php?request=view_profile&query=84804),
+  Public Domain (`music/LICENSE.md`).
 - `tools/ptplayer/` — Frank Wille, Unlicense/public domain
   (`tools/ptplayer/LICENSE`).
 - `tools/kalms-c2p/` — Mikael Kalms' c2p collection, Public Domain
