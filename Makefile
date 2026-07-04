@@ -47,6 +47,53 @@ $(BUILD)/scene7.o: build/art/floppytex.chk build/art/sinw.i build/art/floppypal.
 $(BUILD)/scene8.o: build/art/sinw.i
 $(BUILD)/scene9.o: build/art/canvas.bpl build/art/canvas.i
 
+# --- generated art (build/art/): pixel data + asm includes for the
+# scenes above. Two families:
+#  - pure procedural (PIL, no source image): maketitle/makecards/
+#    makestamp/makedots. Old make (3.81) reruns a shared recipe once
+#    per stale target in a multi-target rule — harmless here, these
+#    are deterministic and sub-second.
+#  - derived from assets/*-src.png via png2amiga.py, then further
+#    derived-from-derived (floppypal, floppytex/sinw, bobs).
+ART := $(BUILD)/art
+PILRUN := uv run --with pillow
+
+$(ART):
+	mkdir -p $@
+
+$(ART)/title.bpl $(ART)/title.i $(ART)/dotpass.i: bin/maketitle.py | $(ART)
+	$(PILRUN) bin/maketitle.py
+
+$(ART)/cards.bpl $(ART)/cards.i: bin/makecards.py | $(ART)
+	$(PILRUN) bin/makecards.py
+
+$(ART)/stamp.i: bin/makestamp.py | $(ART)
+	$(PILRUN) bin/makestamp.py
+
+$(ART)/dottab.i $(ART)/sintab.i: bin/makedots.py | $(ART)
+	$(PILRUN) bin/makedots.py
+
+$(ART)/floppy.bpl $(ART)/floppy.i: assets/floppy-src.png bin/png2amiga.py | $(ART)
+	bin/png2amiga.py assets/floppy-src.png -o $(ART)/floppy \
+	    --colors 16 --scale 160x128 --preview
+
+$(ART)/comic.bpl $(ART)/comic.i: assets/comic-src.png bin/png2amiga.py | $(ART)
+	bin/png2amiga.py assets/comic-src.png -o $(ART)/comic \
+	    --colors 32 --scale 320x256 --preview
+
+$(ART)/canvas.bpl $(ART)/canvas.i: assets/canvas_src.png bin/png2amiga.py | $(ART)
+	bin/png2amiga.py assets/canvas_src.png -o $(ART)/canvas \
+	    --colors 256 --scale 320x256 --planar --preview
+
+$(ART)/floppypal.i: $(ART)/floppy.bpl $(ART)/floppy.i bin/palvariants.py
+	$(PILRUN) bin/palvariants.py
+
+$(ART)/floppytex.chk $(ART)/sinw.i: $(ART)/floppy.i bin/makeroto.py
+	$(PILRUN) bin/makeroto.py
+
+$(ART)/bobs.bpl $(ART)/bobs.msk $(ART)/bobs.i: $(ART)/comic.i bin/makebobs.py
+	$(PILRUN) bin/makebobs.py
+
 $(BUILD)/demo: $(OBJS)
 	$(VLINK) -bamigahunk -s -M$(BUILD)/demo.map -o $@ $(OBJS)
 
