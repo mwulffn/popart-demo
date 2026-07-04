@@ -45,6 +45,10 @@ _LVOSuperState	equ	-150
 	xref	sc5_update
 	xref	sc6_init
 	xref	sc6_update
+	xref	sc7_init
+	xref	sc7_update
+	xref	sc8_init
+	xref	sc8_update
 
 	xdef	songdone
 
@@ -194,14 +198,18 @@ waitblit:
 ; scene dispatch tables
 ; scene_bounds: first song position NOT belonging to the scene
 ;---------------------------------------------------------------------
+; encore timeline: title 0-3, warhol 4-9, dots 10-12, dive 13-15,
+; comic 16-19, conveyor 20-23, brillo 24-27, credits 28-33
 scene_bounds:
-	dc.b	4,10,16,22,28,127
+	dc.b	4,10,13,16,20,24,28,127
 	even
 
 scene_inits:
-	dc.l	sc1_init,sc2_init,sc3_init,sc4_init,sc5_init,sc6_init
+	dc.l	sc1_init,sc2_init,sc3_init,sc7_init
+	dc.l	sc4_init,sc5_init,sc8_init,sc6_init
 scene_updates:
-	dc.l	sc1_update,sc2_update,sc3_update,sc4_update,sc5_update,sc6_update
+	dc.l	sc1_update,sc2_update,sc3_update,sc7_update
+	dc.l	sc4_update,sc5_update,sc8_update,sc6_update
 
 ; Scene ABI: init = copper list + buffers ready (may run mid-frame,
 ; takes effect at next vblank); update = called once per frame after

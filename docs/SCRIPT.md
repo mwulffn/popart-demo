@@ -74,7 +74,11 @@ flashes on downbeats.
 
 CUT: squeegee at end of pos 9, into the breakdown.
 
-## SCENE 3 — "THE SCREEN ITSELF" (pos 10-15, 0:55-1:29, 34 s)
+> **REVISION (encore cut):** two scenes added without changing the
+> 3:09 total — positions redistributed: dots 10-12, DIVE 13-15, comic
+> 16-19, conveyor 20-23, BRILLO 24-27, credits 28-33 unchanged.
+
+## SCENE 3 — "THE SCREEN ITSELF" (pos 10-12, 0:55-1:12, 17 s)
 
 VISUAL: Process made visible: the halftone screen with nothing printed
 on it. Full-screen field of **giant Ben-Day dots** (16×16 px cells,
@@ -93,9 +97,28 @@ downbeat.
 
 MUSIC: pat-0 breakdown = idle grid; B-section entry = full plasma.
 
-CUT: squeegee at end of pos 15.
+CUT: hard slam at end of pos 12 — the camera falls INTO the screen.
 
-## SCENE 4 — "WHAAM!" (pos 16-21, 1:29-2:02, 33 s)
+## SCENE 3B — "THE DIVE" (pos 13-15, 1:12-1:29, 17 s)
+
+VISUAL: The technical flex. Full-screen **rotozoomer** (chunky pixels,
+CPU-rendered, Kalms c2p to 4 AGA bitplanes, line-doubled by copper):
+the texture is the floppy print itself, tiling to infinity. The camera
+is inside the halftone: at pos 13 we are so close the Ben-Day dots are
+boulders, slowly rotating; through pos 14 the camera pulls out and the
+dots resolve into the floppy, then into a FIELD of floppies repeating
+to the horizon — the edition unbounded; pos 15 the spin accelerates
+and the zoom breathes with the music.
+
+COLOR: the 16-color floppy palette. On every kick the whole world
+flashes one of the scene-2 print-run variants for 2 frames (BPLCON4
+palette shift — the silkscreen pass applied to all of reality).
+
+MUSIC: B-section (pat 4/5). Kick = variant flash + zoom pulse.
+
+CUT: hard slam at end of pos 15.
+
+## SCENE 4 — "WHAAM!" (pos 16-19, 1:29-1:51, 22 s)
 
 VISUAL: The comic panel. Background: Flux-generated comic-book explosion
 panel (Lichtenstein pastiche: starburst, thick outlines, halftone
@@ -114,9 +137,9 @@ stamp row via copper).
 MUSIC: A-section reprise: snare = stamp, downbeat = flash+shake. Loud,
 dumb, heroic — the comic panel at gallery scale.
 
-CUT: squeegee at end of pos 21.
+CUT: hard slam at end of pos 19.
 
-## SCENE 5 — "PRODUCTION LINE" (pos 22-27, 2:02-2:36, 34 s)
+## SCENE 5 — "PRODUCTION LINE" (pos 20-23, 1:51-2:13, 22 s)
 
 VISUAL: Mass production. Four full-width horizontal **conveyor bands**
 (64 px each), every band showing the same pre-tiled row of floppy-disk
@@ -134,7 +157,26 @@ advancing).
 
 MUSIC: B-section reprise. Scroll speed locked to tempo.
 
-CUT: squeegee at end of pos 27.
+CUT: hard slam at end of pos 23.
+
+## SCENE 5B — "BRILLO BOX" (pos 24-27, 2:13-2:36, 22 s)
+
+VISUAL: Warhol put the supermarket carton on a gallery plinth; we put
+the floppy in 3D space. A **real-time flat-shaded vector floppy** —
+box body, shutter and label as raised face details — tumbling at
+heroic scale, blitter line-drawn and blitter-filled, double buffered.
+Faces in flat pop colors with THICK BLACK OUTLINES: not a rendering,
+a printed cartoon of an object that happens to rotate. No gouraud, no
+gradients — Pop Art doesn't shade, it fills.
+
+COLOR: each visible face holds one flat color from the pop palette;
+on every downbeat the face-color assignment rotates one step (the
+print queue advancing across the object). Background paper.
+
+MUSIC: A-section tail into B-reprise at pos 26 — the reprise hit
+kicks the tumble speed up a notch.
+
+CUT: hard slam at end of pos 27.
 
 ## SCENE 6 — "COLOPHON" (pos 28-33, 2:36-3:09, 33 s)
 
@@ -145,7 +187,7 @@ text, plane 1 = same text offset (+2,+1) px; palette: %01 cyan,
 %10 magenta, %11 ink — the off-register print that proves it's a print.
 
 CARD 1 (pos 28-29):      POPART
-                         a demo in six print runs
+                         a demo in eight print runs
 
 CARD 2 (pos 30-31):      music: "DancinOnAmiga"
                          Katie Cadet (public domain)
@@ -170,9 +212,8 @@ FIN.
 ## Timing implementation notes
 
 - Scene switch = ptplayer song-position table lookup each vblank:
-  `pos < 4 → scene1, < 10 → scene2, < 16 → scene3, < 22 → scene4,
-  < 28 → scene5, else scene6`. Squeegee starts 12 frames before the
-  boundary (position + row lookahead: row ≥ 58 of last position).
+  `pos < 4 → title, < 10 → warhol, < 13 → dots, < 16 → dive,
+  < 20 → comic, < 24 → conveyor, < 28 → brillo, else credits`.
 - Groove is swing (F05/F03 alternating, tempo 115): kick = row mod 8
   == 0 (downbeat), snare = row mod 8 == 4, bar = 16 rows, position =
   4 bars. All from ptplayer row counter (PatternPos/16), exported.
