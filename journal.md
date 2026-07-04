@@ -188,3 +188,135 @@ Modes: fullscreen art, logos (blitter objects), fonts/sprite sheets.
 - `make release` → `build/demo-release.adf` with shrinkled exe.
 - Also has `-d` raw-data mode for crunching individual assets
   (needs decruncher call at runtime — decrunchers in Shrinkler repo).
+
+## 2026-07-04 — PopArt demo: interpretation, music, script (branch popart)
+
+### Decisions
+- **Interpretation first** (docs/INTERPRETATION.md): Pop Art = 4 operations
+  (repetition, process-made-visible, arbitrary flat color, low subject at
+  heroic scale). Rule: every effect must BE one of these operations executed
+  by the hardware that natively does it (copper palette passes = silkscreen,
+  Ben-Day dots = halftone, blitter = printing press). Styled-only effects
+  rejected.
+- **Subject: the floppy disk** as the consumer object (our own medium =
+  the supermarket shelf). Not obvious; alternatives (soup can pastiche,
+  Marilyn) rejected as copying Pop Art's *subjects* instead of applying
+  its *method* to our own culture.
+- **Music: kc-dancinonamiga.mod** (Katie Cadet, 3:09, 43 KB, 125 BPM).
+  Why: verified Public Domain on module page (the modarchive cc-by BROWSE
+  list is unreliable — applejuice-4mat listed under cc-by but its page says
+  "Mod Archive Distribution license", unusable). Genre literally "Pop
+  (general)"; 34 positions × 5.57 s = clean sync lattice; tiny. Runners-up:
+  Drozerix "Silicon Dancer" (PD, 3:44, 253 KB — too long, 6× size).
+- **Player: ptplayer 6.4** (Frank Wille, public domain, aminet) — scene
+  best-of-breed, CIA-timed. tools/ptplayer/ pristine copy.
+- **Sync via ptplayer song position/row, not frame counting**: CIA 125 BPM
+  tick = exactly 50 Hz but PAL VBL = 49.92 Hz → ~15 frames drift over 3 min.
+  Reading replayer state kills the drift; needs small documented patch to
+  export mt_SongPos/mt_PatternPos.
+- **bin/modinfo.py** written: MOD parser, playtime simulation (F/B/D
+  commands), --sync prints time at each song position → scene table.
+- **docs/SCRIPT.md**: 6 scenes on position boundaries 4/10/16/22/28/34.
+  Transition = "squeegee pass" (copper bar wipe), no crossfades — Pop Art
+  prints, it doesn't blend.
+
+## 2026-07-04 — PopArt scenes 1+2 working
+
+- Scene 1 (title print run): 8 halftone passes verified mid-print
+  (paper pinholes visible in letters at pass 7), palette slams on kicks.
+  Gotcha: forgot BPLEN in DMACON — flat color until bitplane DMA enabled.
+- Scene 2 (Warhol grid): **BPLCON3 bank bits are write-side only** — they
+  never affect which colors DISPLAY. First build showed 4 identical
+  cells. Correct AGA mechanism: BPLCON4 BPLAM (XOR on pixel index) —
+  palette k lives at color entries k*16, one copper BPLCON4 write per
+  cell edge (per scanline: WAIT $05 / MOVE / WAIT $91 / MOVE, 16-byte
+  stride, poked by CPU only on state change). Verified: 4 distinct print
+  runs, clean split at x=160.
+- bin/palvariants.py: 8 print-run palettes (4 hue rotations, sat pushed
+  ×1.6+0.15 so even paper tints like silkscreen ink; 4 inverted
+  "misprint" variants for the kick flash).
+- mcp-gdb gotcha rediscovered: read_memory/registers HALT the target and
+  leave it halted — always cont() after, or use monitor screenshot which
+  is safe while running. Also: this FS-UAE build runs uncapped (~3x
+  realtime) — wall-clock waits are unreliable, the music beacon is truth.
+
+## 2026-07-04 — PopArt scenes 4-6, release build, full-run verification
+
+### Scene 4 (WHAAM! comic panel)
+- Cookie-cut stamps (A=mask B=bob C=D=screen, LF $ca), masks pre-expanded
+  to all 5 planes so one blit per stamp; word-aligned positions, no shifts.
+- **Bug 1**: overlapping stamp rects — TTL expiry restores the full rect
+  from the pristine panel, erasing chunks of younger overlapping stamps.
+  Fix: 3x3 non-overlapping position grid.
+- **Bug 2**: stamp positions with odd byte offsets (x=8/216 -> offset 1/27)
+  — blitter pointers must be even. Symptom: shredded partial bobs. Fix:
+  x in {16,112,208}.
+- White slam = 2 frames BPLCON0 planes-off + COLOR00 white; shake =
+  decaying BPLCON1 values.
+
+### Scene 5 (production line)
+- ONE 384x64 band bitmap, 4 copper reloads of BPL1PT = 4 conveyor bands;
+  hw scroll = fine BPLCON1 + coarse pointer step, net-left = 16w - v.
+  DDFSTRT widened to $30 for scroll headroom (fetch 21 words, modulo 6).
+  Two-tone palette per band via copper; queue advances on downbeat.
+
+### Scene 6 (colophon) — misregistration is two pointers into ONE bitmap
+- BPL2PT = BPL1PT - 40 (drops image 1px) + BPLCON1 PF2H=2 (2px right);
+  palette %01 cyan / %10 magenta / %11 ink. Zero runtime cost.
+- Song end: main loop calls _mt_end once (songdone flag), scene 6 slams
+  paper magenta and prints the screen out with scene 1's dot passes on
+  the shared plane — misregistered halftone flood, then freeze.
+
+### Tooling
+- `make INITPOS=n` — starts module (and therefore the whole music-driven
+  demo) at song position n. Jump straight to any scene, music synced.
+  Indispensable: emulator runs anywhere from 1x to 3x realtime, so
+  wall-clock targeting of scenes is hopeless.
+- Squeegee-wipe transitions from the script draft were cut: hard slam
+  cuts on position boundaries are more honest to the print metaphor
+  (documented in SCRIPT.md production note).
+
+### Release + acceptance
+- `make release`: Shrinkler 202,844 -> 84,660 bytes; ADF 90 KB / 880 KB.
+- Full no-intervention run of demo-release.adf verified in emulator:
+  title print-run -> Warhol grid (misprint flash caught) -> CMY dot
+  plasma -> comic stamps (BANG!, slam frame caught) -> conveyor ->
+  cards 1/2/3 -> song end -> magenta print-out freeze. Audio DMA $f
+  throughout; scene cuts land on song positions.
+
+## 2026-07-04 — Bugfix: scene 4 bobs clipped to half height
+
+User-reported: burst bobs showed only top ~50%. Cause found by grepping
+the built binary for the BLTSIZE immediate: `3d7c 2806` — height 160,
+not 320. **vasm mot syntax has NO C-style operator precedence**:
+`320<<6|BOB_BPR/2` evaluates strictly left-to-right as
+`((320<<6)|12)/2 = $2806`, halving the blit height. Fix: parenthesize —
+`(320<<6)!(BOB_BPR/2)` — in both s4_stamp and s4_restore. All other
+BLTSIZE expressions audited: none mix division, all correct.
+Verified: BLTSIZE opcode now $5006; halt-and-screenshot in emulator
+shows full 89x60 px ZAP! stamp (was 89x30). Lesson: never write an
+unparenthesized multi-operator constant expression in vasm; the binary
+grep (`xxd | grep 3d7c`) is the fastest way to check what an immediate
+actually assembled to.
+
+## 2026-07-04 — Producer credit + Makefile asset dependencies
+
+- Card 2 now credits: PRODUCER — Michael Wulff Nielsen (card relaid,
+  press line condensed to one size-9 line). Verified: offline decode of
+  built cards.bpl + card 1 in emulator on the same build (identical
+  render path — cards are verbatim single-plane blits).
+- **Gotcha**: scene objects had no Makefile dependencies on their
+  INCBIN'd assets — regenerating cards.bpl did NOT rebuild scene6.o and
+  the first test run showed the old card. Added explicit deps for all
+  build/art/* includes/incbins (and src/custom.i) to every scene object.
+
+## 2026-07-04 — PopArt complete, merged to main
+
+Demo accepted by producer. Final state: 6 scenes, 3:09 runtime driven
+entirely by ptplayer song position, one 880 KB floppy (release ADF uses
+90 KB), verified start-to-finish in the emulator on the shrinkled
+release build. Deliverables: docs/INTERPRETATION.md, docs/SCRIPT.md
+(with production notes on deviations), this journal, music/LICENSE.md.
+CLAUDE.md updated with the new tools, INITPOS debug builds, the $660
+beacon, and the hard-won gotchas (vasm precedence, BPLCON3 vs BPLCON4,
+even blitter offsets, mcp-gdb halt-on-read, uncapped emulator speed).
