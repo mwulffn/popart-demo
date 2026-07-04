@@ -219,3 +219,23 @@ Modes: fullscreen art, logos (blitter objects), fonts/sprite sheets.
 - **docs/SCRIPT.md**: 6 scenes on position boundaries 4/10/16/22/28/34.
   Transition = "squeegee pass" (copper bar wipe), no crossfades — Pop Art
   prints, it doesn't blend.
+
+## 2026-07-04 — PopArt scenes 1+2 working
+
+- Scene 1 (title print run): 8 halftone passes verified mid-print
+  (paper pinholes visible in letters at pass 7), palette slams on kicks.
+  Gotcha: forgot BPLEN in DMACON — flat color until bitplane DMA enabled.
+- Scene 2 (Warhol grid): **BPLCON3 bank bits are write-side only** — they
+  never affect which colors DISPLAY. First build showed 4 identical
+  cells. Correct AGA mechanism: BPLCON4 BPLAM (XOR on pixel index) —
+  palette k lives at color entries k*16, one copper BPLCON4 write per
+  cell edge (per scanline: WAIT $05 / MOVE / WAIT $91 / MOVE, 16-byte
+  stride, poked by CPU only on state change). Verified: 4 distinct print
+  runs, clean split at x=160.
+- bin/palvariants.py: 8 print-run palettes (4 hue rotations, sat pushed
+  ×1.6+0.15 so even paper tints like silkscreen ink; 4 inverted
+  "misprint" variants for the kick flash).
+- mcp-gdb gotcha rediscovered: read_memory/registers HALT the target and
+  leave it halted — always cont() after, or use monitor screenshot which
+  is safe while running. Also: this FS-UAE build runs uncapped (~3x
+  realtime) — wall-clock waits are unreliable, the music beacon is truth.

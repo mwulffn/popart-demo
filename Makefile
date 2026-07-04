@@ -19,7 +19,7 @@ $(BUILD)/demo-release.adf: $(BUILD)/demo.shr src/startup-sequence
 	    + write $(BUILD)/demo.shr demo
 	@echo "--- $@:" && $(XDFTOOL) $@ list
 
-OBJS := $(BUILD)/main.o $(BUILD)/scene1.o $(BUILD)/ptplayer.o $(BUILD)/music.o
+OBJS := $(BUILD)/main.o $(BUILD)/scene1.o $(BUILD)/scene2.o $(BUILD)/ptplayer.o $(BUILD)/music.o
 
 $(BUILD)/%.o: src/%.asm | $(BUILD)
 	$(VASM) -m68020 -Fhunk -quiet -o $@ $<
