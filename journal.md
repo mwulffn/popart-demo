@@ -188,3 +188,34 @@ Modes: fullscreen art, logos (blitter objects), fonts/sprite sheets.
 - `make release` → `build/demo-release.adf` with shrinkled exe.
 - Also has `-d` raw-data mode for crunching individual assets
   (needs decruncher call at runtime — decrunchers in Shrinkler repo).
+
+## 2026-07-04 — PopArt demo: interpretation, music, script (branch popart)
+
+### Decisions
+- **Interpretation first** (docs/INTERPRETATION.md): Pop Art = 4 operations
+  (repetition, process-made-visible, arbitrary flat color, low subject at
+  heroic scale). Rule: every effect must BE one of these operations executed
+  by the hardware that natively does it (copper palette passes = silkscreen,
+  Ben-Day dots = halftone, blitter = printing press). Styled-only effects
+  rejected.
+- **Subject: the floppy disk** as the consumer object (our own medium =
+  the supermarket shelf). Not obvious; alternatives (soup can pastiche,
+  Marilyn) rejected as copying Pop Art's *subjects* instead of applying
+  its *method* to our own culture.
+- **Music: kc-dancinonamiga.mod** (Katie Cadet, 3:09, 43 KB, 125 BPM).
+  Why: verified Public Domain on module page (the modarchive cc-by BROWSE
+  list is unreliable — applejuice-4mat listed under cc-by but its page says
+  "Mod Archive Distribution license", unusable). Genre literally "Pop
+  (general)"; 34 positions × 5.57 s = clean sync lattice; tiny. Runners-up:
+  Drozerix "Silicon Dancer" (PD, 3:44, 253 KB — too long, 6× size).
+- **Player: ptplayer 6.4** (Frank Wille, public domain, aminet) — scene
+  best-of-breed, CIA-timed. tools/ptplayer/ pristine copy.
+- **Sync via ptplayer song position/row, not frame counting**: CIA 125 BPM
+  tick = exactly 50 Hz but PAL VBL = 49.92 Hz → ~15 frames drift over 3 min.
+  Reading replayer state kills the drift; needs small documented patch to
+  export mt_SongPos/mt_PatternPos.
+- **bin/modinfo.py** written: MOD parser, playtime simulation (F/B/D
+  commands), --sync prints time at each song position → scene table.
+- **docs/SCRIPT.md**: 6 scenes on position boundaries 4/10/16/22/28/34.
+  Transition = "squeegee pass" (copper bar wipe), no crossfades — Pop Art
+  prints, it doesn't blend.
