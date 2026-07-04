@@ -11,8 +11,9 @@
 ;   scenes       — placeholder flats for now; replaced one by one.
 ;
 ; Scene boundaries (song positions, see docs/SCRIPT.md):
-;   1 title 0-3 | 2 warhol 4-9 | 3 dots 10-15 | 4 comic 16-21
-;   5 conveyor 22-27 | 6 credits 28-33, then SongEnd → end state
+;   1 title 0-1 | 2 warhol 2-7 | 3 dots 8-9 | 3B dive 10-13
+;   4 comic 14-17 | 5 conveyor 18-19 | 5B brillo 20-23
+;   5C canvas 24-27 | 6 credits 28-33, then SongEnd → end state
 ;
 ; Music grid: 64 rows/position, swing F05/F03 @ tempo 115.
 ; kick = row&7==0, snare = row&7==4, bar = 16 rows.
@@ -49,6 +50,8 @@ _LVOSuperState	equ	-150
 	xref	sc7_update
 	xref	sc8_init
 	xref	sc8_update
+	xref	sc9_init
+	xref	sc9_update
 
 	xdef	songdone
 
@@ -198,18 +201,19 @@ waitblit:
 ; scene dispatch tables
 ; scene_bounds: first song position NOT belonging to the scene
 ;---------------------------------------------------------------------
-; encore timeline: title 0-3, warhol 4-9, dots 10-12, dive 13-15,
-; comic 16-19, conveyor 20-23, brillo 24-27, credits 28-33
+; canvas timeline: title 0-1, warhol 2-7, dots 8-9, dive 10-13,
+; comic 14-17, conveyor 18-19, brillo 20-23, canvas 24-27,
+; credits 28-33 — every cut on a pattern change (even position)
 scene_bounds:
-	dc.b	4,10,13,16,20,24,28,127
+	dc.b	2,8,10,14,18,20,24,28,127
 	even
 
 scene_inits:
 	dc.l	sc1_init,sc2_init,sc3_init,sc7_init
-	dc.l	sc4_init,sc5_init,sc8_init,sc6_init
+	dc.l	sc4_init,sc5_init,sc8_init,sc9_init,sc6_init
 scene_updates:
 	dc.l	sc1_update,sc2_update,sc3_update,sc7_update
-	dc.l	sc4_update,sc5_update,sc8_update,sc6_update
+	dc.l	sc4_update,sc5_update,sc8_update,sc9_update,sc6_update
 
 ; Scene ABI: init = copper list + buffers ready (may run mid-frame,
 ; takes effect at next vblank); update = called once per frame after

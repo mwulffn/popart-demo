@@ -1,5 +1,5 @@
 ;=====================================================================
-; scene3.asm — "THE SCREEN ITSELF" (song pos 10-15)
+; scene3.asm — "THE SCREEN ITSELF" (song pos 8-9)
 ;
 ; The halftone screen with nothing printed on it: a 20x16 grid of
 ; 16x16 px Ben-Day dots, radii driven by a three-sine plasma (CPU,
@@ -63,9 +63,10 @@ sc3_update:
 	add.w	#32,s3_t3
 .nothump:
 
-	; damping: pos 10-11 (breakdown) -> flat grid around level 8
+	; scene sits on the A-groove now (pos 8-9): idle grid for the
+	; first position, full plasma from pos 9
 	moveq	#0,d7			; d7 = 0: full amplitude
-	cmp.w	#12,songpos
+	cmp.w	#9,songpos
 	bge.s	.amp
 	moveq	#1,d7			; damped
 .amp:

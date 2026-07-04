@@ -1,5 +1,5 @@
 ;=====================================================================
-; scene5.asm — "PRODUCTION LINE" (song pos 22-27)
+; scene5.asm — "PRODUCTION LINE" (song pos 18-19)
 ;
 ; Four full-width conveyor bands (64 px), all displaying THE SAME
 ; pre-tiled band bitmap (one row of floppy stamps, pitch 48 px): the

@@ -27,7 +27,14 @@ doesn't blend, it prints.
 
 ---
 
-## SCENE 1 — "THE TITLE PRINT RUN" (pos 0-3, 0:00-0:22, 22 s)
+> **REVISION (canvas cut):** pacing pass + one new scene, 3:09 total
+> unchanged. Title and conveyor halved (both overstayed their one
+> idea), freed positions fund SCENE 5C "THE CANVAS" — the full-screen
+> 256-color print. New map: title 0-1, warhol 2-7, dots 8-9, dive
+> 10-13, comic 14-17, conveyor 18-19, brillo 20-23, canvas 24-27,
+> credits 28-33. Every cut stays on a pattern change.
+
+## SCENE 1 — "THE TITLE PRINT RUN" (pos 0-1, 0:00-0:11, 11 s)
 
 FADE IN FROM: black (power-on).
 
@@ -41,19 +48,21 @@ stencil), so the title emerges the way an image emerges on a silkscreen
 — coarse dots first (16 px pitch), then finer interleaved passes
 (8 px offset grid) sharpening it.
 
-COLOR: dots print in ink near-black on paper. On the first horn stab of
-pos 2 (0:11): background COLOR00 slams from paper to cadmium yellow.
-Every downbeat after: background hops yellow → magenta → cyan → orange
-(copper writes COLOR00, beat-synced from music row counter). Letters
-stay ink. Bottom strip, small print: "a mass-produced audiovisual
-product" in 1-plane text.
+COLOR: dots print in ink near-black on paper. The scene is split down
+the middle: pos 0 = the print run, all 8 passes at two per bar, paper
+background; pos 1 = the payoff, finished title riding background
+COLOR00 slams — yellow → magenta → cyan → orange, one per kick.
+(Revision note: the four-position original had the same two halves
+but 11 s each; halved, the structure survives — build, then slam —
+with no dead time.)
 
-MUSIC: intro drums (pos 0-1) = dots stamping (one pass per bar).
-Horn hook enters pos 2 = first background color slam.
+MUSIC: intro drums pos 0 = dots stamping (one pass per half-bar);
+pos 1 = kick-synced background slams. Horn hook enters pos 2 = the
+cut itself.
 
-CUT: squeegee pass at end of pos 3.
+CUT: hard slam at end of pos 1, on the horn entry.
 
-## SCENE 2 — "EDITION OF EIGHT" (pos 4-9, 0:22-0:55, 33 s)
+## SCENE 2 — "EDITION OF EIGHT" (pos 2-7, 0:11-0:45, 33 s)
 
 VISUAL: The consumer object. A pop-art floppy disk (Flux-generated:
 3.5" floppy, Lichtenstein treatment, bold outline, flat fills), one
@@ -72,13 +81,9 @@ TEXT: none. The object speaks.
 MUSIC: A-section groove. Palette rotation on position changes, cell
 flashes on downbeats.
 
-CUT: squeegee at end of pos 9, into the breakdown.
+CUT: hard slam at end of pos 7.
 
-> **REVISION (encore cut):** two scenes added without changing the
-> 3:09 total — positions redistributed: dots 10-12, DIVE 13-15, comic
-> 16-19, conveyor 20-23, BRILLO 24-27, credits 28-33 unchanged.
-
-## SCENE 3 — "THE SCREEN ITSELF" (pos 10-12, 0:55-1:12, 17 s)
+## SCENE 3 — "THE SCREEN ITSELF" (pos 8-9, 0:45-0:56, 11 s)
 
 VISUAL: Process made visible: the halftone screen with nothing printed
 on it. Full-screen field of **giant Ben-Day dots** (16×16 px cells,
@@ -89,36 +94,38 @@ tile table (16 dot sizes), double-buffered.
 COLOR: paper background. Dot color banded by copper into three
 horizontal process-color bands: magenta / yellow / cyan — the three
 print heads. Bands' boundaries slide slowly (copper list rewritten per
-frame). During the breakdown (pos 10-11) the plasma is barely moving —
-flat dot grid, machine idling; when the B-section synths land at pos 12
-(1:06), plasma amplitude jumps to full and the band boundaries start
-moving. Dot phase resets (visible "thump" of the screen) on each
-downbeat.
+frame). For its first position (pos 8) the plasma is barely moving —
+flat dot grid, machine idling; at pos 9 amplitude jumps to full and
+the band boundaries start moving. Dot phase resets (visible "thump"
+of the screen) on each downbeat.
 
-MUSIC: pat-0 breakdown = idle grid; B-section entry = full plasma.
+MUSIC: A-section groove throughout; the idle→full jump is the scene's
+own build, one position each.
 
-CUT: hard slam at end of pos 12 — the camera falls INTO the screen.
+CUT: hard slam at end of pos 9 — the camera falls INTO the screen.
 
-## SCENE 3B — "THE DIVE" (pos 13-15, 1:12-1:29, 17 s)
+## SCENE 3B — "THE DIVE" (pos 10-13, 0:56-1:18, 22 s)
 
 VISUAL: The technical flex. Full-screen **rotozoomer** (chunky pixels,
 CPU-rendered, Kalms c2p to 4 AGA bitplanes, line-doubled by copper):
 the texture is the floppy print itself, tiling to infinity. The camera
-is inside the halftone: at pos 13 we are so close the Ben-Day dots are
-boulders, slowly rotating; through pos 14 the camera pulls out and the
-dots resolve into the floppy, then into a FIELD of floppies repeating
-to the horizon — the edition unbounded; pos 15 the spin accelerates
-and the zoom breathes with the music.
+is inside the halftone: through the breakdown (pos 10-11) we are so
+close the Ben-Day dots are boulders, slowly rotating — the sparse
+drums are the dolly's pace; the camera pulls out and the dots resolve
+into the floppy, then into a FIELD of floppies repeating to the
+horizon — the edition unbounded; when the B-section synths land at
+pos 12 the spin accelerates and the zoom breathes with the music.
 
 COLOR: the 16-color floppy palette. On every kick the whole world
 flashes one of the scene-2 print-run variants for 2 frames (BPLCON4
 palette shift — the silkscreen pass applied to all of reality).
 
-MUSIC: B-section (pat 4/5). Kick = variant flash + zoom pulse.
+MUSIC: breakdown = slow dolly, B-section = acceleration. Kick =
+variant flash + zoom pulse.
 
-CUT: hard slam at end of pos 15.
+CUT: hard slam at end of pos 13.
 
-## SCENE 4 — "WHAAM!" (pos 16-19, 1:29-1:51, 22 s)
+## SCENE 4 — "WHAAM!" (pos 14-17, 1:18-1:40, 22 s)
 
 VISUAL: The comic panel. Background: Flux-generated comic-book explosion
 panel (Lichtenstein pastiche: starburst, thick outlines, halftone
@@ -134,12 +141,12 @@ COLOR: background palette static; each stamped burst forces its own
 sub-palette bank (AGA bank per bob region — bank switch above/below the
 stamp row via copper).
 
-MUSIC: A-section reprise: snare = stamp, downbeat = flash+shake. Loud,
-dumb, heroic — the comic panel at gallery scale.
+MUSIC: B-section tail into the A-reprise: snare = stamp, downbeat =
+flash+shake. Loud, dumb, heroic — the comic panel at gallery scale.
 
-CUT: hard slam at end of pos 19.
+CUT: hard slam at end of pos 17.
 
-## SCENE 5 — "PRODUCTION LINE" (pos 20-23, 1:51-2:13, 22 s)
+## SCENE 5 — "PRODUCTION LINE" (pos 18-19, 1:40-1:51, 11 s)
 
 VISUAL: Mass production. Four full-width horizontal **conveyor bands**
 (64 px each), every band showing the same pre-tiled row of floppy-disk
@@ -155,11 +162,13 @@ paper/cyan, ink/yellow, paper/acid-green) via per-band palette writes.
 On downbeat: the band colors shift down one band (the print queue
 advancing).
 
-MUSIC: B-section reprise. Scroll speed locked to tempo.
+MUSIC: A-section reprise. Scroll speed locked to tempo. (Revision
+note: halved from four positions — a conveyor belt makes its point in
+two bars; by the third the eye has priced it.)
 
-CUT: hard slam at end of pos 23.
+CUT: hard slam at end of pos 19.
 
-## SCENE 5B — "BRILLO BOX" (pos 24-27, 2:13-2:36, 22 s)
+## SCENE 5B — "BRILLO BOX" (pos 20-23, 1:51-2:13, 22 s)
 
 VISUAL: Warhol put the supermarket carton on a gallery plinth; we put
 the floppy in 3D space. A **real-time flat-shaded vector floppy** —
@@ -173,8 +182,31 @@ COLOR: each visible face holds one flat color from the pop palette;
 on every downbeat the face-color assignment rotates one step (the
 print queue advancing across the object). Background paper.
 
-MUSIC: A-section tail into B-reprise at pos 26 — the reprise hit
-kicks the tumble speed up a notch.
+MUSIC: A-section reprise; halfway through (pos 22) the tumble speed
+kicks up a notch.
+
+CUT: hard slam at end of pos 23.
+
+## SCENE 5C — "THE CANVAS" (pos 24-27, 2:13-2:36, 22 s)
+
+VISUAL: The finished work. After five scenes of process — screens,
+stamps, conveyors, cartons — the demo finally hangs a painting: one
+full-screen **256-color print** (320×256, 8 AGA bitplanes, 64-bit
+fetch — the whole palette register file used at once), Flux-generated
+in the house style: Lichtenstein weeping girl, Ben-Day dots, bold
+outlines, holding up a floppy disk. The scene-2 object returns as
+*subject matter* — the consumer good promoted to art object.
+
+MOTION: none. Nothing animates, nothing scrolls, no copper tricks —
+the one scene in the demo that does not move is the one that shows
+the art. (Demoscene tradition: the hand-pixeled gallery picture,
+displayed with pride and zero irony.)
+
+COLOR: all 256 of them — the demo's palette-restraint thesis broken
+exactly once, for the masterpiece.
+
+MUSIC: A-reprise tail; when the B-reprise lands at pos 26, one
+2-frame paper flash — the last squeegee pass of the demo.
 
 CUT: hard slam at end of pos 27.
 
@@ -187,7 +219,7 @@ text, plane 1 = same text offset (+2,+1) px; palette: %01 cyan,
 %10 magenta, %11 ink — the off-register print that proves it's a print.
 
 CARD 1 (pos 28-29):      POPART
-                         a demo in eight print runs
+                         a demo in nine print runs
 
 CARD 2 (pos 30-31):      music: "DancinOnAmiga"
                          Katie Cadet (public domain)
@@ -212,8 +244,9 @@ FIN.
 ## Timing implementation notes
 
 - Scene switch = ptplayer song-position table lookup each vblank:
-  `pos < 4 → title, < 10 → warhol, < 13 → dots, < 16 → dive,
-  < 20 → comic, < 24 → conveyor, < 28 → brillo, else credits`.
+  `pos < 2 → title, < 8 → warhol, < 10 → dots, < 14 → dive,
+  < 18 → comic, < 20 → conveyor, < 24 → brillo, < 28 → canvas,
+  else credits`.
 - Groove is swing (F05/F03 alternating, tempo 115): kick = row mod 8
   == 0 (downbeat), snare = row mod 8 == 4, bar = 16 rows, position =
   4 bars. All from ptplayer row counter (PatternPos/16), exported.

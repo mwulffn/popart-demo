@@ -1,5 +1,5 @@
 ;=====================================================================
-; scene7.asm — "THE DIVE" (song pos 13-15): chunky rotozoomer
+; scene7.asm — "THE DIVE" (song pos 10-13): chunky rotozoomer
 ;
 ; 160 texture samples per line, each written as a doubled word (2 px),
 ; into a 320x100 chunky buffer in FAST ram; Kalms c2p1x1_4_c5 converts
@@ -122,7 +122,8 @@ sc7_update:
 	; --- rotation: accelerates as the scene builds (updates run at
 	;     ~10 fps, so keep the per-update step small and stately) ---
 	move.w	songpos,d1
-	sub.w	#12,d1			; 1..3
+	sub.w	#9,d1			; 1..4: slow dolly through the
+					; breakdown, B-section speeds it up
 	add.w	d1,s7_ang
 	move.w	s7_ang,d1
 	and.w	#255,d1

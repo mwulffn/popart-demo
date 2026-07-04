@@ -57,8 +57,9 @@ Full chain: `generate-image.py` at 2x size → `png2amiga.py --scale` down.
 make                                  # build/demo.adf (xdftool from amitools)
 make release                          # shrinkled exe → build/demo-release.adf
 make INITPOS=n                        # start demo at song position n (debug:
-                                      # 4=warhol 10=dots 13=dive 16=comic
-                                      # 20=conveyor 24=brillo 28=credits); touch main.asm first
+                                      # 2=warhol 8=dots 10=dive 14=comic
+                                      # 18=conveyor 20=brillo 24=canvas
+                                      # 28=credits); touch main.asm first
 debug_start(extra_args="--floppy_drive_0=/abs/build/demo.adf")  # gdb MCP
 # boot takes 5-25 s wall; emulator runs UNCAPPED (1-3x realtime) so
 # never trust wall-clock for scene timing — read the beacon (chip $660:
@@ -81,8 +82,20 @@ GDB connection persistently. Typical cycle:
 debug_start()                 # launches FS-UAE, connects, boots kickstart
 registers() / read_memory("0xdff000", 32) / step() / breakpoint("0x...")
 cont(); screenshot("/abs/path.png")   # screenshot works while running
+wait_beacon("18")             # run until songpos==0x18 ($664 beacon) —
+                              # deterministic scene capture, NO sleep
+                              # polling (emulator speed is uncapped).
+                              # wait_beacon("9","0x666") = songrow 9.
+                              # Halt lands BEFORE that frame's scene
+                              # update: display still shows previous
+                              # frame — arm a row-wait a few rows in
+                              # before screenshotting the new scene.
 debug_stop()
 ```
+Under the hood wait_beacon = UAE debugger memory watchpoint with value
+match (`console w 9 664 2 W V<val>`); manual equivalent works via
+monitor(). The 'w add' console reply gets eaten by the stub (times
+out) — harmless; removal replies fine.
 
 Do NOT drive real gdb against the emulator — the stub violates RSP
 (`vMustReplyEmpty` → `E01`) and GDB >= 8 aborts. The MCP server speaks

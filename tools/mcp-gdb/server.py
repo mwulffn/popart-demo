@@ -555,6 +555,55 @@ def monitor(command: str) -> str:
 
 
 @mcp.tool()
+def wait_beacon(value: str, address: str = "0x664", timeout: int = 120) -> str:
+    """
+    Run until the target writes word <value> to <address> — deterministic
+    scene-timing capture via the demo's beacon ($664 songpos, $666
+    songrow). Halts, arms a UAE memory watchpoint (write + value match),
+    resumes, waits for the hit, removes the watchpoint.
+
+    Target is left HALTED at the matching write. NB the halt lands
+    mid-mainloop BEFORE that frame's scene update: the display still
+    shows the previous frame. To screenshot the new state, arm a second
+    wait (e.g. songrow a few rows in) or cont briefly first.
+
+    Args:
+        value:   Hex word to match (e.g. '1e' = songpos 30)
+        address: Watched word address (default '0x664' = songpos)
+        timeout: Seconds to wait for the hit
+    """
+    global _running
+    err = _require_connected()
+    if err:
+        return err
+    addr = _parse_addr(address)
+    val = int(value, 16)
+    with _lock:
+        _halt_if_running()
+        # arm: watchpoint 9 (leaves 0-8 for manual use). The stub eats
+        # the console reply for 'w add' — send and swallow the timeout.
+        cmd = f"console w 9 {addr:x} 2 W V{val:x}"
+        hexed = binascii.hexlify(cmd.encode()).decode()
+        _send_packet(f"qRcmd,{hexed}", timeout=2.0)
+        _sock.sendall(_frame("vCont;c"))
+        _running = True
+        reply = _stop_reply_pending(timeout=float(min(timeout, 600)))
+        hit = reply is not None and "watch" in reply
+        if reply is not None:
+            _running = False
+        else:
+            # no hit: halt so the disarm below lands on a stopped target
+            _halt_if_running()
+        hexed = binascii.hexlify(b"console w 9").decode()
+        _send_packet(f"qRcmd,{hexed}", timeout=2.0)
+    if hit:
+        return f"hit: word 0x{val:x} written to 0x{addr:x} ({reply})"
+    if reply is not None:
+        return f"stopped, but not the watchpoint: {reply}"
+    return f"[no hit within {timeout}s — target halted, watchpoint removed]"
+
+
+@mcp.tool()
 def screenshot(path: str = "") -> str:
     """
     Capture the emulator display to a PNG.
