@@ -5,7 +5,10 @@ for the running development log — append an entry after each significant
 milestone or discovery.
 
 ## Layout
-- `kickstart/` — Kickstart 3.1 rev 40.68 A1200 ROM (do not commit elsewhere/redistribute)
+- `kickstart/` — Kickstart 3.1 rev 40.68 A1200 ROM (do not commit
+  elsewhere/redistribute. MUST be purged before publication — it is in
+  git history since the root commit, so `git rm` is not enough: rewrite
+  history, e.g. `git filter-repo --path kickstart --invert-paths`)
 - `tools/fs-uae-gdb/` — GDB-patched FS-UAE (from uae-dap 1.1.5 npm package,
   WinUAE 5.1.0 core, x86_64 via Rosetta)
 - `tools/mcp-gdb/` — debug MCP server (adopted from mariposa-2, rewritten
