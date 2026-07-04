@@ -309,3 +309,14 @@ actually assembled to.
   INCBIN'd assets — regenerating cards.bpl did NOT rebuild scene6.o and
   the first test run showed the old card. Added explicit deps for all
   build/art/* includes/incbins (and src/custom.i) to every scene object.
+
+## 2026-07-04 — PopArt complete, merged to main
+
+Demo accepted by producer. Final state: 6 scenes, 3:09 runtime driven
+entirely by ptplayer song position, one 880 KB floppy (release ADF uses
+90 KB), verified start-to-finish in the emulator on the shrinkled
+release build. Deliverables: docs/INTERPRETATION.md, docs/SCRIPT.md
+(with production notes on deviations), this journal, music/LICENSE.md.
+CLAUDE.md updated with the new tools, INITPOS debug builds, the $660
+beacon, and the hard-won gotchas (vasm precedence, BPLCON3 vs BPLCON4,
+even blitter offsets, mcp-gdb halt-on-read, uncapped emulator speed).

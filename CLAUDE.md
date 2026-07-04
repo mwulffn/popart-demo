@@ -20,11 +20,23 @@ milestone or discovery.
   `~/ComfyUI-Shared/models` via `extra_model_paths.yaml`
 - `bin/comfyui-server.sh` — launch ComfyUI server on 127.0.0.1:8188
 - `bin/generate-image.py` — Flux.2 image generation CLI (see below)
+- `bin/modinfo.py` — MOD analyzer: playtime simulation, `--sync` prints
+  time per song position (scene timing), `--samples`, `--rows`
+- `bin/maketitle.py`, `makedots.py`, `makebobs.py`, `makestamp.py`,
+  `makecards.py`, `palvariants.py` — PopArt asset generators (PIL,
+  `uv run --with pillow`) → `build/art/*`; Makefile has explicit deps
+  from scene objects to these outputs
+- `music/` — kc-dancinonamiga.mod (Public Domain, see `music/LICENSE.md`)
+- `tools/ptplayer/` — pristine ptplayer 6.4 (Frank Wille, PD);
+  `src/ptplayer.asm` is a patched copy exporting _mt_SongPos /
+  _mt_PatternPos / _mt_Speed for music-driven scene sync
+- `docs/` — PopArt demo deliverables: INTERPRETATION.md, SCRIPT.md
 - `screenshots/` — output dir (gitignored)
-- `journal.md` — development journal
-- `tools/bin/` — vasmm68k_mot + vlink (gitignored; rebuild from
-  sun.hasenbraten.de tarballs)
-- `src/` — demo source (`main.asm`, `startup-sequence`)
+- `journal.md` — development journal + decision journal
+- `tools/bin/` — vasmm68k_mot + vlink + Shrinkler (gitignored; rebuild
+  from sun.hasenbraten.de tarballs / github.com/askeksa/Shrinkler)
+- `src/` — demo source: `main.asm` (framework/sequencer), `scene1-6.asm`,
+  `custom.i`, `music.asm`, `ptplayer.asm`, `startup-sequence`
 - `Makefile` — `make` = vasm → vlink → bootable ADF (`build/demo.adf`,
   gitignored); `make run` boots it in the emulator
 
@@ -44,8 +56,13 @@ Full chain: `generate-image.py` at 2x size → `png2amiga.py --scale` down.
 ```sh
 make                                  # build/demo.adf (xdftool from amitools)
 make release                          # shrinkled exe → build/demo-release.adf
+make INITPOS=n                        # start demo at song position n (debug:
+                                      # 4=warhol 10=dots 16=comic 22=conveyor
+                                      # 28=credits); touch src/main.asm first
 debug_start(extra_args="--floppy_drive_0=/abs/build/demo.adf")  # gdb MCP
-# wait ~25 s (kickstart + floppy boot), then screenshot() to verify
+# boot takes 5-25 s wall; emulator runs UNCAPPED (1-3x realtime) so
+# never trust wall-clock for scene timing — read the beacon (chip $660:
+# framecnt.l, songpos.w, songrow.w) or use INITPOS
 ```
 
 Target machine: **A1200, 2 MB chip + 4 MB fast RAM** (fast_memory=4096 in
@@ -105,3 +122,11 @@ bin/generate-image.py "prompt" -o /abs/path.png [--width 640 --height 512] \
 ## Conventions
 - Screenshots: always absolute paths (emulator cwd differs from project)
 - Verify graphics changes by booting + screenshot, not by assumption
+- gdb MCP: read_memory/registers HALT the target and leave it halted —
+  always cont() after; monitor screenshot is safe while running
+- vasm mot syntax has NO C operator precedence — expressions evaluate
+  left-to-right; ALWAYS parenthesize multi-operator constants (a
+  `320<<6|X/2` BLTSIZE once silently halved a blit)
+- Blitter pointers must be even (word-aligned byte offsets)
+- AGA: BPLCON3 bank bits affect palette WRITES only; use BPLCON4 BPLAM
+  (pixel-index XOR) to switch displayed palettes per screen region
