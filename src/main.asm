@@ -47,6 +47,8 @@ _LVOSuperState	equ	-150
 	xref	sc6_update
 	xref	sc7_init
 	xref	sc7_update
+	xref	sc8_init
+	xref	sc8_update
 
 	xdef	songdone
 
@@ -204,10 +206,10 @@ scene_bounds:
 
 scene_inits:
 	dc.l	sc1_init,sc2_init,sc3_init,sc7_init
-	dc.l	sc4_init,sc5_init,sc5_init,sc6_init
+	dc.l	sc4_init,sc5_init,sc8_init,sc6_init
 scene_updates:
 	dc.l	sc1_update,sc2_update,sc3_update,sc7_update
-	dc.l	sc4_update,sc5_update,sc5_update,sc6_update
+	dc.l	sc4_update,sc5_update,sc8_update,sc6_update
 
 ; Scene ABI: init = copper list + buffers ready (may run mid-frame,
 ; takes effect at next vblank); update = called once per frame after

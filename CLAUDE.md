@@ -57,8 +57,8 @@ Full chain: `generate-image.py` at 2x size → `png2amiga.py --scale` down.
 make                                  # build/demo.adf (xdftool from amitools)
 make release                          # shrinkled exe → build/demo-release.adf
 make INITPOS=n                        # start demo at song position n (debug:
-                                      # 4=warhol 10=dots 16=comic 22=conveyor
-                                      # 28=credits); touch src/main.asm first
+                                      # 4=warhol 10=dots 13=dive 16=comic
+                                      # 20=conveyor 24=brillo 28=credits); touch main.asm first
 debug_start(extra_args="--floppy_drive_0=/abs/build/demo.adf")  # gdb MCP
 # boot takes 5-25 s wall; emulator runs UNCAPPED (1-3x realtime) so
 # never trust wall-clock for scene timing — read the beacon (chip $660:

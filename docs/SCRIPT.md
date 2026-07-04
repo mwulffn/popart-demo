@@ -187,7 +187,7 @@ text, plane 1 = same text offset (+2,+1) px; palette: %01 cyan,
 %10 magenta, %11 ink — the off-register print that proves it's a print.
 
 CARD 1 (pos 28-29):      POPART
-                         a demo in six print runs
+                         a demo in eight print runs
 
 CARD 2 (pos 30-31):      music: "DancinOnAmiga"
                          Katie Cadet (public domain)

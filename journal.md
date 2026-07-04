@@ -320,3 +320,62 @@ release build. Deliverables: docs/INTERPRETATION.md, docs/SCRIPT.md
 CLAUDE.md updated with the new tools, INITPOS debug builds, the $660
 beacon, and the hard-won gotchas (vasm precedence, BPLCON3 vs BPLCON4,
 even blitter offsets, mcp-gdb halt-on-read, uncapped emulator speed).
+
+## 2026-07-04 — Encore: two technical scenes added (branch popart-encore)
+
+Producer asked for something that pushes the A1200. Timeline
+redistributed inside the same 3:09 (music has zero spare — 34 positions
+all used): dots 10-12, DIVE 13-15, comic 16-19, conveyor 20-23,
+BRILLO 24-27, credits unchanged. Now eight print runs.
+
+### Scene 3B "THE DIVE" — chunky rotozoomer + Kalms c2p
+- Kalms c2p1x1_4_c5_gen (PD) assembles under vasm unmodified; geometry
+  pinned via BPLX/BPLY defines (320x100, plane stride 4000).
+- 320x100 chunky in fast RAM (160 samples/line, doubled via 16-word
+  pixel-pair table), copper line-doubles to 200 rows, letterboxed.
+- Texture trick: 128x128 floppy print stored at 256-byte stride with
+  each row doubled -> u wraps free in its 8-bit int part, v row base is
+  just v&$7f00: 9-op inner loop. 7.8 -> 13.2 fps measured via beacon
+  against the music clock (only reliable clock; emulator is uncapped).
+- Gotcha: per-line copper modulo writes at hpos $db race the end-of-
+  fetch modulo add -> doubling phase slips, bottom of screen shreds.
+  Write mods at line START ($07).
+
+### Scene 5B "BRILLO BOX" — blitter-vector floppy
+- Classic pipeline: matrix in vars, 16 verts rotated+projected,
+  backface cull by screen cross product, per face: CPU fill-edge dots
+  (half-open [y0,y1)) -> blitter inclusive fill (DESC+IFE) -> composite
+  into the color's planes; thick ink outline = CPU Bresenham into an
+  outline plane OR'd into all 4 planes at (0,0)+(+1,+1). ~13 fps.
+- War stories, in order:
+  1. LF $fc is A|B not A|C — with BLTBDAT=$ffff from line draws the
+     "OR" flooded the region solid. A|C = $fa. Minterm bit order is
+     ABC, not intuition.
+  2. Blitter octant/AMOD: BLTAMOD must be 4*(minor-major); wrote
+     4*minor-2*major first — every diagonal collapsed to 45 deg
+     (16-ray star test made this obvious instantly).
+  3. Blitter SING fill-lines double-plot shared vertices; XOR cancels
+     the toggle at pass-through vertices -> fill bleeds to the left
+     edge. Fix: CPU-walked fill edges, half-open [y0,y1).
+  4. divs overflow left garbage in a projected vertex once per few
+     hundred frames -> every downstream write address poisoned ->
+     wild write through low chip RAM, trashed the vector table,
+     Line-F guru (Error 8000000B mid-demo). Fix: clamp projections
+     to the region. Beacon corruption at $661 was the tell.
+  5. Producer's live observation: outlines looked like blitter
+     corruption (dashed/truncated) while fills were clean — arbitrary-
+     start blitter lines never fully behaved (the star test only
+     exercised aligned starts). Retired blitter line mode entirely:
+     outlines are CPU Bresenham too. <=12 short edges, cost nil.
+  6. Decals (shutter/label) must REPLACE the front face's plane bits
+     (~A&C on clear planes), not OR — OR unions indices into ink.
+  7. Near-edge-on faces leave sliver outlines: cull cross<=800 and
+     gate decals on the front face being healthily visible (>2500).
+- Face colors rotate through the pop palette per downbeat; tumble
+  speeds up at the B-reprise (pos 26). All colors <=2 planes.
+
+### Acceptance
+Release ADF (Shrinkler) full natural run: title -> warhol -> dots ->
+dive -> comic -> conveyor -> brillo -> credits (card 1 now "A DEMO IN
+EIGHT PRINT RUNS") -> magenta print-out freeze. No crash, no
+intervention. INITPOS scene map updated in Makefile/CLAUDE.md.
