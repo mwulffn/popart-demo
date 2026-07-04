@@ -298,3 +298,14 @@ shows full 89x60 px ZAP! stamp (was 89x30). Lesson: never write an
 unparenthesized multi-operator constant expression in vasm; the binary
 grep (`xxd | grep 3d7c`) is the fastest way to check what an immediate
 actually assembled to.
+
+## 2026-07-04 — Producer credit + Makefile asset dependencies
+
+- Card 2 now credits: PRODUCER — Michael Wulff Nielsen (card relaid,
+  press line condensed to one size-9 line). Verified: offline decode of
+  built cards.bpl + card 1 in emulator on the same build (identical
+  render path — cards are verbatim single-plane blits).
+- **Gotcha**: scene objects had no Makefile dependencies on their
+  INCBIN'd assets — regenerating cards.bpl did NOT rebuild scene6.o and
+  the first test run showed the old card. Added explicit deps for all
+  build/art/* includes/incbins (and src/custom.i) to every scene object.

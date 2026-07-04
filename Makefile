@@ -31,6 +31,17 @@ $(BUILD)/%.o: src/%.asm | $(BUILD)
 
 $(BUILD)/music.o: music/kc-dancinonamiga.mod
 
+# scene objects also depend on their INCBIN'd / included assets
+$(BUILD)/main.o $(BUILD)/scene1.o $(BUILD)/scene2.o $(BUILD)/scene3.o \
+$(BUILD)/scene4.o $(BUILD)/scene5.o $(BUILD)/scene6.o: src/custom.i
+$(BUILD)/scene1.o: build/art/title.bpl build/art/title.i build/art/dotpass.i
+$(BUILD)/scene2.o: build/art/floppy.bpl build/art/floppypal.i
+$(BUILD)/scene3.o: build/art/dottab.i build/art/sintab.i
+$(BUILD)/scene4.o: build/art/comic.bpl build/art/comic.i \
+	build/art/bobs.bpl build/art/bobs.msk build/art/bobs.i
+$(BUILD)/scene5.o: build/art/stamp.i
+$(BUILD)/scene6.o: build/art/cards.bpl build/art/cards.i build/art/dotpass.i
+
 $(BUILD)/demo: $(OBJS)
 	$(VLINK) -bamigahunk -s -M$(BUILD)/demo.map -o $@ $(OBJS)
 
