@@ -379,3 +379,78 @@ Release ADF (Shrinkler) full natural run: title -> warhol -> dots ->
 dive -> comic -> conveyor -> brillo -> credits (card 1 now "A DEMO IN
 EIGHT PRINT RUNS") -> magenta print-out freeze. No crash, no
 intervention. INITPOS scene map updated in Makefile/CLAUDE.md.
+
+## 2026-07-04 — Brillo box: per-face sliver-cull thresholds
+
+Bug report: faces + decals vanished long before turning backfacing.
+Cause: flat sliver-cull threshold (cross<=800) sized for the big front
+face (full-on cross ~9600) also applied to the thin 12-unit side faces
+(full-on cross ~1100) — sides were culled while still 70% face-on, and
+the shutter decal (~1500) at 54%. Decal gate s8_frontok additionally
+required front cross >2500 (26%).
+
+Fix (scene8.asm):
+- Face entry grew to 8 bytes: word threshold at offset 6, ~1/16 of
+  each face's full-on screen cross (600 front/back, 70 sides, 90
+  shutter, 180 label). Cull is now `cross <= threshold(face)`.
+- s8_frontok gate lowered 2500 -> 1200 and updated BEFORE the cull, so
+  a backfacing front clears the flag instead of leaving it stale.
+Verified INITPOS=24 boot + screenshots: thin sides stay visible at
+steep tilt, decals persist to near-edge-on, no stray outline hairs.
+
+## 2026-07-04 — Brillo box: shared-edge dedup in outline pass
+
+Producer spotted redundant work: outline pass drew each face's 4 edges,
+so every body edge between two visible faces was Bresenham'd twice
+(3 visible faces = 12 draws for 9 unique edges).
+
+Fix (scene8.asm): static edge table s8_edges (20 entries: v0, v1,
+adjacent-face bitmask — 12 body edges with 2 faces each, 4+4 decal
+edges with 1). Face visibility now recorded as a bitmask (s8_vismask,
+bset per visible face; replaced the s8_vis pointer list + s8_nvis).
+Outline pass iterates edges once, draws when mask AND vismask != 0.
+Same silhouette semantics: edge shows if ANY adjacent face is visible.
+Fill pass untouched — its per-face edge walk is XOR parity, cannot
+dedup across faces.
+
+Verified INITPOS=24 boot: 3/4 pose with decals, edge-on, and back-side
+poses all render identical outlines, no double-thick or missing edges.
+
+## 2026-07-04 — Brillo box: bbox-sized blits + folded outline pass
+
+Scene felt slow: ~380 KB blitter traffic/frame, every blit sized to
+the full 192x176 region though the object covers a fraction of it.
+Fix (scene8.asm), output pixel-identical:
+- Object bbox (all 16 projected verts, +1 px pad for thick outline)
+  computed per frame; screen-region clear, outline-plane clear and
+  outline merge blits all shrink to it. Clears erase the STALE bbox
+  (stored per screen buffer / for the outline plane), not the new one.
+- Per-face bbox: temp clear, fill and composite blits sized to the
+  face — sliver side faces now cost sliver blits. Temp plane outside
+  the face bbox stays stale, never read.
+- Outline thickening (0,0)+(+1,+1) folded into one blit per plane:
+  B channel = outline plane one row up with B-shift 1, D = A|B|C
+  ($0ffe/$1000). 8 blits -> 4. Zero guard row before s8_outl for
+  bbox row -1. Fill-carry note: convex poly = 0/2 crossings per row,
+  so bbox'd descending fill stays safe.
+- Measured via beacon (framecnt vs song rows, emulator speed
+  independent): 3.80 frames/row vs song's 4.35 VBL/row = ~44 fps.
+  Baseline measurement skipped (producer called it good).
+
+## 2026-07-04 — Brillo box: 3 bitplanes + free decals
+
+Decal-visible frames dropped fps: replace-mode composites hit all 4
+planes for shutter AND label (8 bbox blits + 2 temp clears + 2 fills).
+Fix (scene8.asm):
+- 3 bitplanes now: palette 0=paper, 1-6 pop colors (coltab 1..6),
+  7=ink. BPLCON0 $3200. Every plane loop (screen clear, composite,
+  outline merge) is 3 iterations, -25% on all screen blits.
+- Label costs ZERO blits: its edges are XOR'd into the FRONT face's
+  fill-dot pass, the inclusive fill toggles off inside -> paper hole
+  (label is now background-colored by design). Ink outline via the
+  edge table as before. Color byte 0 in the face table = outline-only.
+- Shutter replace mode dropped: ink = 7 = all planes set, plain OR
+  over the front face is exact. Replace-mode blitter path deleted.
+- Fill-carry still safe: label hole adds 2 dots per row -> even count.
+Verified STATICTEST 3/4 pose: front + shutter (ink) + label (paper
+hole) + sides all correct. Producer approved mid-verification.
