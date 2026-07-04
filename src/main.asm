@@ -26,6 +26,7 @@ _LVOSuperState	equ	-150
 
 	xref	_mt_install
 	xref	_mt_init
+	xref	_mt_end
 	xref	_mt_Enable
 	xref	_mt_SongPos
 	xref	_mt_PatternPos
@@ -38,6 +39,14 @@ _LVOSuperState	equ	-150
 	xref	sc2_update
 	xref	sc3_init
 	xref	sc3_update
+	xref	sc4_init
+	xref	sc4_update
+	xref	sc5_init
+	xref	sc5_update
+	xref	sc6_init
+	xref	sc6_update
+
+	xdef	songdone
 
 	xdef	waitblit
 	xdef	songpos
@@ -83,8 +92,11 @@ start:
 	jsr	_mt_install
 	lea	_module,a0
 	sub.l	a1,a1			; samples follow patterns
-	moveq	#0,d0			; from song position 0
-	jsr	_mt_init
+	ifnd	INITPOS
+INITPOS	equ	0
+	endc
+	moveq	#INITPOS,d0		; song start (build with
+	jsr	_mt_init		; INITPOS=n to jump to a scene)
 	st	_mt_Enable
 
 	; --- display on: blank copper list until scene 1 installs its own
@@ -116,11 +128,18 @@ mainloop:
 	move.w	d0,$664.w		; songpos
 	move.w	d1,$666.w		; songrow
 
-	; after the song ends, stay on the final scene's end state
+	; after the song ends: silence the replayer once, freeze the
+	; final scene on its end state
 	tst.b	_mt_SongEnd
 	beq.s	.live
 	moveq	#33,d0			; clamp to last position
 	move.w	d0,songpos
+	tst.b	songdone
+	bne.s	.live
+	st	songdone
+	movem.l	d0-d1/a0-a1,-(sp)
+	jsr	_mt_end			; stop audio (a6 = CUSTOM)
+	movem.l	(sp)+,d0-d1/a0-a1
 .live:
 	; scene index from song position
 	lea	scene_bounds(pc),a0
@@ -184,39 +203,9 @@ scene_inits:
 scene_updates:
 	dc.l	sc1_update,sc2_update,sc3_update,sc4_update,sc5_update,sc6_update
 
-;=====================================================================
-; placeholder scenes — one flat color each, beat flash on the kick.
-; Each will be replaced by the real effect, keeping init/update ABI:
-; init: copper list + buffers ready; update: called once per frame,
-; may trash d0-d1/a0-a1, a6 = CUSTOM preserved.
-;=====================================================================
-
-; flat-color placeholder: d0 = base color, beat-flashed toward white
-flat_update:
-	move.w	songrow,d1
-	and.w	#7,d1			; rows 0-1 after each kick: flash
-	cmp.w	#2,d1
-	bge.s	.set
-	move.w	#$0fff,d0
-.set:	move.w	d0,cop_color+2
-	rts
-
-sc4_init:
-sc5_init:
-sc6_init:
-	lea	cop_blank,a0
-	move.l	a0,COP1LC(a6)
-	rts
-
-sc4_update:
-	move.w	#$0fd0,d0		; yellow
-	bra.s	flat_update
-sc5_update:
-	move.w	#$08e0,d0		; acid green
-	bra.s	flat_update
-sc6_update:
-	move.w	#$0112,d0		; ink
-	bra.s	flat_update
+; Scene ABI: init = copper list + buffers ready (may run mid-frame,
+; takes effect at next vblank); update = called once per frame after
+; waitvbl, a6 = CUSTOM preserved, everything else clobberable.
 
 ;=====================================================================
 	section	vars,bss
@@ -226,13 +215,15 @@ framecnt:	ds.l	1
 songpos:	ds.w	1
 songrow:	ds.w	1
 curscene:	ds.w	1
+songdone:	ds.b	1
+		even
 
 ;=====================================================================
 	section	coplists,data_c
 ;=====================================================================
+; startup copper list: black screen until scene 1 installs its own
 cop_blank:
 	dc.w	$01fc,$0000		; FMODE
 	dc.w	$0100,$0200		; BPLCON0: no planes
-cop_color:
-	dc.w	$0180,$0000		; COLOR00, rewritten by scenes
+	dc.w	$0180,$0000		; COLOR00 black
 	dc.w	$ffff,$fffe

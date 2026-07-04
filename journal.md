@@ -239,3 +239,47 @@ Modes: fullscreen art, logos (blitter objects), fonts/sprite sheets.
   leave it halted — always cont() after, or use monitor screenshot which
   is safe while running. Also: this FS-UAE build runs uncapped (~3x
   realtime) — wall-clock waits are unreliable, the music beacon is truth.
+
+## 2026-07-04 — PopArt scenes 4-6, release build, full-run verification
+
+### Scene 4 (WHAAM! comic panel)
+- Cookie-cut stamps (A=mask B=bob C=D=screen, LF $ca), masks pre-expanded
+  to all 5 planes so one blit per stamp; word-aligned positions, no shifts.
+- **Bug 1**: overlapping stamp rects — TTL expiry restores the full rect
+  from the pristine panel, erasing chunks of younger overlapping stamps.
+  Fix: 3x3 non-overlapping position grid.
+- **Bug 2**: stamp positions with odd byte offsets (x=8/216 -> offset 1/27)
+  — blitter pointers must be even. Symptom: shredded partial bobs. Fix:
+  x in {16,112,208}.
+- White slam = 2 frames BPLCON0 planes-off + COLOR00 white; shake =
+  decaying BPLCON1 values.
+
+### Scene 5 (production line)
+- ONE 384x64 band bitmap, 4 copper reloads of BPL1PT = 4 conveyor bands;
+  hw scroll = fine BPLCON1 + coarse pointer step, net-left = 16w - v.
+  DDFSTRT widened to $30 for scroll headroom (fetch 21 words, modulo 6).
+  Two-tone palette per band via copper; queue advances on downbeat.
+
+### Scene 6 (colophon) — misregistration is two pointers into ONE bitmap
+- BPL2PT = BPL1PT - 40 (drops image 1px) + BPLCON1 PF2H=2 (2px right);
+  palette %01 cyan / %10 magenta / %11 ink. Zero runtime cost.
+- Song end: main loop calls _mt_end once (songdone flag), scene 6 slams
+  paper magenta and prints the screen out with scene 1's dot passes on
+  the shared plane — misregistered halftone flood, then freeze.
+
+### Tooling
+- `make INITPOS=n` — starts module (and therefore the whole music-driven
+  demo) at song position n. Jump straight to any scene, music synced.
+  Indispensable: emulator runs anywhere from 1x to 3x realtime, so
+  wall-clock targeting of scenes is hopeless.
+- Squeegee-wipe transitions from the script draft were cut: hard slam
+  cuts on position boundaries are more honest to the print metaphor
+  (documented in SCRIPT.md production note).
+
+### Release + acceptance
+- `make release`: Shrinkler 202,844 -> 84,660 bytes; ADF 90 KB / 880 KB.
+- Full no-intervention run of demo-release.adf verified in emulator:
+  title print-run -> Warhol grid (misprint flash caught) -> CMY dot
+  plasma -> comic stamps (BANG!, slam frame caught) -> conveyor ->
+  cards 1/2/3 -> song end -> magenta print-out freeze. Audio DMA $f
+  throughout; scene cuts land on song positions.

@@ -16,11 +16,14 @@ gradients except process-color ramps): hot magenta $F0C, cadmium yellow
 $FD0, cyan $0CE, orange $F60, acid green $8E0, paper off-white $FED,
 ink near-black $112.
 
-Transition rule: every cut is a **squeegee pass** — a horizontal paper-
-white bar (copper COLOR00 band, full width, ~40 px tall) sweeps top to
-bottom in 12 frames; the new scene's copper list is swapped while the
-bar covers mid-screen. Like a silkscreen squeegee dragging the next
-color pass. No crossfades anywhere: Pop Art doesn't blend, it prints.
+Transition rule: every cut is a **hard slam on the beat** — the new
+scene's copper list replaces the old one at the vblank of a song-
+position boundary, no fade, no wipe. (Production note: the original
+draft specified a "squeegee pass" wipe; cut during implementation —
+the straight jump cut on the downbeat is more honest to the print
+metaphor and to how silkscreen editions actually land: one pull, next
+sheet. Documented in journal.md.) No crossfades anywhere: Pop Art
+doesn't blend, it prints.
 
 ---
 
