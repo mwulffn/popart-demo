@@ -14,7 +14,7 @@ W, H = 320, 256
 
 CARDS = [
     [(46, "POPART", 60),
-     (13, "A DEMO IN EIGHT PRINT RUNS", 150)],
+     (13, "A DEMO IN NINE PRINT RUNS", 150)],
     [(17, "MUSIC", 20),
      (13, '"DANCINONAMIGA" BY KATIE CADET', 48),
      (11, "PUBLIC DOMAIN - THE MOD ARCHIVE", 68),

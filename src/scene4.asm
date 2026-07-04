@@ -1,5 +1,5 @@
 ;=====================================================================
-; scene4.asm — "WHAAM!" (song pos 16-21)
+; scene4.asm — "WHAAM!" (song pos 14-17)
 ;
 ; Static Lichtenstein explosion panel (320x256x5, interleaved). On
 ; every snare a comic burst bob (POP!/BANG!/ZAP!/WHAAM!) is cookie-cut

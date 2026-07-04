@@ -454,3 +454,77 @@ Fix (scene8.asm):
 - Fill-carry still safe: label hole adds 2 dots per row -> even count.
 Verified STATICTEST 3/4 pose: front + shutter (ink) + label (paper
 hole) + sides all correct. Producer approved mid-verification.
+
+## 2026-07-04 — Pacing pass + scene 9 "THE CANVAS" (branch pixelart-scene)
+
+Producer verdict on the encore cut: scene 1 overstays (print done at
+pos 1, then 11 s of static title + bg slams = reads as padding),
+conveyor same (one idea, four positions). Fix: retime everything and
+spend the freed positions on the classic demo move we didn't have —
+the full-screen pixel art gallery piece.
+
+New map (all cuts still on pattern changes, credits untouched):
+title 0-1, warhol 2-7, dots 8-9, dive 10-13, comic 14-17,
+conveyor 18-19, brillo 20-23, CANVAS 24-27, credits 28-33.
+- scene1: color-slam branch deleted — paper the whole run, print
+  completes on the last intro bar, the horn hook at pos 2 IS the cut.
+- scene7 dive gains the breakdown (pos 10-11): rotation step now
+  songpos-9 = 1..4, slow dolly through sparse drums, B-section at 12
+  accelerates. Better fit than the old B-section-only placement.
+- scene3 idle→full plasma moved to its own positions (8→9);
+  scene8 speed-up now pos 22 (mid-scene).
+
+Scene 9 (scene9.asm): 320x256x8 = 256 colors, the first 8-bitplane
+screen in the demo. Facts that made it work first boot:
+- FMODE=3 (64-bit fetch) mandatory — 8 planes lowres doesn't fit DMA
+  at 16-bit fetch. DDFSTOP moves $d0 -> $b8 (5 fetches x 32 cc).
+  DDFSTRT stays $38. Verified pixel-clean first try.
+- BPLxPT must be 64-bit aligned: canvas_data at offset 0 of its own
+  data_c hunk (LoadSeg data lands 8-byte aligned), planes contiguous
+  (--planar) so each plane start is base + n*10240 (10240 % 8 == 0).
+  Interleaved would have broken alignment (base + n*40).
+- 256-entry AGA palette load: per bank (8x32) write hi nibbles, stash
+  lo nibbles, rewrite with LOCT ($0200). png2amiga emits dc.l RGB24
+  for >32 colors.
+- scene6's copper already resets FMODE+DDF (from the dive), so the
+  canvas->credits cut needed nothing.
+- Gotcha: include'ing canvas.i before `section code,code` put
+  CANVAS_PAL in vasm's default section -> R_PC reloc vlink can't emit
+  in hunks. Include must sit inside the code section (scene1/4 pattern).
+
+Art: Flux.2 no-turbo, seed 7 — Lichtenstein weeping girl holding a
+cyan floppy, "IT'S ART!" bubble. The scene-2 consumer object returns
+as subject matter. Quantized to 256 colors it's near-lossless.
+Card 1 text updated: "a demo in nine print runs" (makecards.py).
+Full-run verified via beacon sampling: all eight boundaries fire,
+ADF still fits (901 KB image, 880 KB payload OK per xdftool).
+
+## 2026-07-04 — Scene 1 internal retime + watchpoint-based capture
+
+Producer: the color slam was the good part — bring it back. Scene 1
+now splits its 11 s in half (scene1.asm): all 8 print passes run at
+two per bar (rows/8, clamp 7) filling pos 0; pos 1 is the payoff —
+finished title riding COLOR00 slams, one per kick (YEL/MAG/CYAN/ORG),
+horn hook at pos 2 still lands as the cut.
+
+Verification workflow upgrade, producer's idea: stop racing the
+uncapped emulator with sleep+screenshot — trigger on the beacon
+instead. The WinUAE debugger (via monitor 'console') supports memory
+watchpoints with value match: `w <n> 664 2 W V<pos>` breaks at the
+exact mainloop write of that songpos. Findings:
+- Stop reply arrives as T05watch:00000664 through the normal RSP
+  channel; cont(wait_stop=N) picks it up. Fires on the FIRST write of
+  the matching value — exact position entry, zero slop at any
+  emulator speed.
+- The halt lands mid-mainloop BEFORE that frame's scene update: $666
+  still holds the previous frame's row (63 at a position boundary)
+  and the DISPLAY still shows the previous frame. For "show me the
+  new scene" shots, arm a second watch on $666 (row N) and screenshot
+  there. Used $666 V9 to catch scene 1's magenta slam exactly.
+- Console reply routing is flaky for the watchpoint ADD (qRcmd times
+  out, watch is armed anyway); REMOVE ('w <n>') replies fine. Boot
+  noise never false-triggered $664 V1.
+New MCP tool wait_beacon(value, address=$664, timeout) wraps
+halt→arm→cont→wait→disarm (server.py; loads next session — this
+session drove it manually via monitor+cont). Documented in CLAUDE.md
+and tools/mcp-gdb/README.md.

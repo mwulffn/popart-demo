@@ -1,5 +1,5 @@
 ;=====================================================================
-; scene2.asm — "EDITION OF EIGHT" (song pos 4-9)
+; scene2.asm — "EDITION OF EIGHT" (song pos 2-7)
 ;
 ; One 160x128 16-color print of the floppy, blitted 4x into a 2x2
 ; grid. Color is pure hardware repetition: 8 print-run palettes
@@ -95,9 +95,9 @@ sc2_init:
 
 ;---------------------------------------------------------------------
 sc2_update:
-	; rotation r = songpos-4, flash cell on each kick
+	; rotation r = songpos-2, flash cell on each kick
 	move.w	songpos,d3
-	subq.w	#4,d3			; r = positions into the scene
+	subq.w	#2,d3			; r = positions into the scene
 
 	; kick detect: beat number = (pos*64+row)/8
 	move.w	songpos,d0

@@ -39,6 +39,7 @@ through the same channel (`monitor screenshot`).
 | `cont(wait_stop)` | Resume; optionally wait for breakpoint hit |
 | `interrupt()` | Halt running target (0x03 break byte) |
 | `monitor(command)` | `screenshot <path>` / `profile` / `console <uae-dbg-cmd>` / `dumpdma` |
+| `wait_beacon(value, address, timeout)` | Run until word `value` written to `address` (default $664 songpos beacon). UAE memory watchpoint with value match — deterministic scene-position capture, no wall-clock polling. Halt lands before that frame's scene update. |
 | `screenshot(path)` | Display → PNG, works while target runs |
 | `emulator_log(lines, grep)` | Tail FS-UAE log (`grep='GDBSERVER'` = packet trace) |
 

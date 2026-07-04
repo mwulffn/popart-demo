@@ -1,11 +1,12 @@
 ;=====================================================================
-; scene1.asm — "THE TITLE PRINT RUN" (song pos 0-3)
+; scene1.asm — "THE TITLE PRINT RUN" (song pos 0-1)
 ;
-; POP/ART stencil emerges through 8 halftone print passes: each bar,
-; one more 16px-pitch dot sub-grid is OR'd into a work plane (CPU),
-; then the visible plane is re-printed as title AND work (one blit).
-; From pos 2 (horn hook) the background slams through the pop palette
-; on every kick.
+; POP/ART stencil emerges through 8 halftone print passes: each half
+; bar, one more 16px-pitch dot sub-grid is OR'd into a work plane
+; (CPU), then the visible plane is re-printed as title AND work (one
+; blit). The print fills pos 0; pos 1 is the payoff — the finished
+; title rides background color slams (one per kick) until the horn
+; hook at pos 2, which is the cut to scene 2.
 ;=====================================================================
 
 	include	"src/custom.i"
@@ -41,11 +42,11 @@ sc1_init:
 	rts
 
 sc1_update:
-	; --- halftone pass: bar index = (pos*64+row)/16, clamp 0-7 ---
+	; --- halftone pass: two per bar (8 rows), all 8 inside pos 0 ---
 	move.w	songpos,d0
 	lsl.w	#6,d0
 	add.w	songrow,d0
-	lsr.w	#4,d0			; bar number since song start
+	lsr.w	#3,d0			; half-bar since song start
 	cmp.w	#7,d0
 	ble.s	.p_ok
 	moveq	#7,d0
@@ -96,15 +97,14 @@ sc1_update:
 	move.w	#256<<6|20,BLTSIZE(a6)
 
 .colors:
-	; --- background: paper during the intro, palette slams once the
-	;     horn hook lands (pos >= 2), one color per kick (8 rows) ---
+	; --- background: paper while the print builds (pos 0), then the
+	;     finished title rides the pop palette — one slam per kick
+	;     (8 rows) through pos 1, cut lands on the horn hook ---
 	move.w	#COL_PAPER,d0
-	cmp.w	#2,songpos
+	cmp.w	#1,songpos
 	blt.s	.set
-	move.w	songpos,d0
-	lsl.w	#6,d0
-	add.w	songrow,d0
-	lsr.w	#3,d0			; beat count
+	move.w	songrow,d0
+	lsr.w	#3,d0			; kick count within pos 1
 	and.w	#3,d0
 	add.w	d0,d0
 	lea	.slam(pc),a0

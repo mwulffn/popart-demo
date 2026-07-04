@@ -1,5 +1,5 @@
 ;=====================================================================
-; scene8.asm — "BRILLO BOX" (song pos 24-27): real-time vector floppy
+; scene8.asm — "BRILLO BOX" (song pos 20-23): real-time vector floppy
 ;
 ; Flat-shaded 3D floppy (box body + shutter/label decals on the front
 ; face), tumbling. Classic blitter vector pipeline in a 192x176 region
@@ -19,8 +19,8 @@
 ;   / face bounding box, not the region — the blitter is the frame
 ;   budget here.
 ; Face colors rotate one palette step per downbeat (the print queue
-; advancing across the object); tumble speeds up at the B-reprise
-; (pos 26).
+; advancing across the object); tumble speeds up in the scene's
+; second half (pos 22).
 ;
 ; Blitter line recipe: HRM line mode + Wrobel's corrections
 ; (markwrobel.dk letter 12): BLTAPTL = 4dy-2dx, SIGN ($40) when
@@ -92,7 +92,7 @@ sc8_update:
 .nobeat:
 	moveq	#2,d0
 	moveq	#3,d1
-	cmp.w	#26,songpos		; B-reprise: faster tumble
+	cmp.w	#22,songpos		; second half: faster tumble
 	blt.s	.slow
 	moveq	#3,d0
 	moveq	#5,d1
