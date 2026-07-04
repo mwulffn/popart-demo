@@ -3,6 +3,8 @@ screenshots/
 tools/comfyui/
 build/
 tools/bin/
+tools/fs-uae-gdb/
+kickstart/
 .venv/
 __pycache__/
 *.egg-info/

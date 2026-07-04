@@ -5,12 +5,15 @@ for the running development log — append an entry after each significant
 milestone or discovery.
 
 ## Layout
-- `kickstart/` — Kickstart 3.1 rev 40.68 A1200 ROM (do not commit
-  elsewhere/redistribute. MUST be purged before publication — it is in
-  git history since the root commit, so `git rm` is not enough: rewrite
-  history, e.g. `git filter-repo --path kickstart --invert-paths`)
-- `tools/fs-uae-gdb/` — GDB-patched FS-UAE (from uae-dap 1.1.5 npm package,
-  WinUAE 5.1.0 core, x86_64 via Rosetta)
+- `kickstart/` — Kickstart 3.1 rev 40.68 A1200 ROM, gitignored, not
+  redistributable (Cloanto/Hyperion copyright). Restore from
+  `~/Documents/FS-UAE/Kickstarts/kick40068.A1200` (copy to
+  `kickstart/Kickstart v3.1 rev 40.68 (1993)(Commodore)(A1200).rom`)
+  if the local copy is ever lost. Never re-add to git.
+- `tools/fs-uae-gdb/` — GDB-patched FS-UAE, gitignored, not
+  redistributable (WinUAE-core license). Restore via
+  `npm pack uae-dap@1.1.5`, extract `package/bin/fs-uae/*` into this
+  dir. Never re-add to git.
 - `tools/mcp-gdb/` — debug MCP server (adopted from mariposa-2, rewritten
   to speak GDB-RSP directly)
 - `config/a1200.fs-uae` — emulator config (also works with plain brew fs-uae)
