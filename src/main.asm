@@ -18,29 +18,7 @@
 ; kick = row&7==0, snare = row&7==4, bar = 16 rows.
 ;=====================================================================
 
-CUSTOM	 equ	$dff000
-
-; custom chip register offsets
-DMACONR	 equ	$002
-VPOSR	 equ	$004
-INTENA	 equ	$09a
-INTREQ	 equ	$09c
-DMACON	 equ	$096
-COP1LC	 equ	$080
-COPJMP1	 equ	$088
-DIWSTRT	 equ	$08e
-DIWSTOP	 equ	$090
-DDFSTRT	 equ	$092
-DDFSTOP	 equ	$094
-BPLCON0	 equ	$100
-BPLCON1	 equ	$102
-BPLCON2	 equ	$104
-BPLCON3	 equ	$106
-BPLCON4	 equ	$10c
-BPL1MOD	 equ	$108
-BPL2MOD	 equ	$10a
-COLOR00	 equ	$180
-FMODE	 equ	$1fc
+	include	"src/custom.i"
 
 ; exec offsets
 _LVOForbid	equ	-132
@@ -48,12 +26,19 @@ _LVOSuperState	equ	-150
 
 	xref	_mt_install
 	xref	_mt_init
-	xref	_mt_end
 	xref	_mt_Enable
 	xref	_mt_SongPos
 	xref	_mt_PatternPos
 	xref	_mt_SongEnd
 	xref	_module
+
+	xref	sc1_init
+	xref	sc1_update
+
+	xdef	waitblit
+	xdef	songpos
+	xdef	songrow
+	xdef	framecnt
 
 ;=====================================================================
 	section	code,code
@@ -102,7 +87,7 @@ start:
 	lea	cop_blank,a0
 	move.l	a0,COP1LC(a6)
 	move.w	d0,COPJMP1(a6)
-	move.w	#$8280,DMACON(a6)	; master + copper
+	move.w	#$87c0,DMACON(a6)	; master+bitplane+copper+blitter+blithog
 
 	move.w	#-1,curscene		; force scene 0 init on first frame
 
@@ -174,6 +159,15 @@ waitvbl:
 	rts
 
 ;---------------------------------------------------------------------
+; waitblit — wait for blitter idle (with pre-read, 68020-safe)
+;---------------------------------------------------------------------
+waitblit:
+	tst.w	DMACONR(a6)		; bus settle
+.w:	btst	#6,DMACONR(a6)
+	bne.s	.w
+	rts
+
+;---------------------------------------------------------------------
 ; scene dispatch tables
 ; scene_bounds: first song position NOT belonging to the scene
 ;---------------------------------------------------------------------
@@ -203,7 +197,6 @@ flat_update:
 .set:	move.w	d0,cop_color+2
 	rts
 
-sc1_init:
 sc2_init:
 sc3_init:
 sc4_init:
@@ -213,9 +206,6 @@ sc6_init:
 	move.l	a0,COP1LC(a6)
 	rts
 
-sc1_update:
-	move.w	#$0fed,d0		; paper
-	bra.s	flat_update
 sc2_update:
 	move.w	#$0f0c,d0		; magenta
 	bra.s	flat_update
