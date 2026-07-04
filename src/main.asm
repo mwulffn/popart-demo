@@ -36,6 +36,8 @@ _LVOSuperState	equ	-150
 	xref	sc1_update
 	xref	sc2_init
 	xref	sc2_update
+	xref	sc3_init
+	xref	sc3_update
 
 	xdef	waitblit
 	xdef	songpos
@@ -199,7 +201,6 @@ flat_update:
 .set:	move.w	d0,cop_color+2
 	rts
 
-sc3_init:
 sc4_init:
 sc5_init:
 sc6_init:
@@ -207,9 +208,6 @@ sc6_init:
 	move.l	a0,COP1LC(a6)
 	rts
 
-sc3_update:
-	move.w	#$00ce,d0		; cyan
-	bra.s	flat_update
 sc4_update:
 	move.w	#$0fd0,d0		; yellow
 	bra.s	flat_update
