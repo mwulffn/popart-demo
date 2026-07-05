@@ -1,4 +1,4 @@
-# demo-fable — PopArt
+# PopArt
 
 An Amiga A1200 (AGA, Kickstart 3.1) demo: nine scenes of copper palette
 swaps, Ben-Day dot halftones, blitter bobs, and a 256-color full-screen
