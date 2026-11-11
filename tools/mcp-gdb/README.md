@@ -49,7 +49,7 @@ through the same channel (`monitor screenshot`).
 uv sync --directory tools/mcp-gdb
 
 claude mcp add --scope local gdb -- \
-  uv run --directory /Users/wulff/Projects/demo-fable/tools/mcp-gdb python server.py
+  uv run --directory /Users/wulff/Projects/amiga/demos/popart-demo/tools/mcp-gdb python server.py
 ```
 
 ## Stub quirks learned the hard way
